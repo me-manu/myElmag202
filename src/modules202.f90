@@ -8,9 +8,10 @@ module stack
   integer :: jcmb
 
   type one_event
-     integer(int8) :: icq
-     !double precision :: en,x,z,t,w,the1,the2,xxc,xx,dt
-     real(real64) :: en,x,z,t,w,the1,the2,xxc,xx,dt
+     !integer(int8) :: icq
+     integer :: icq
+     double precision :: en,x,z,t,w,the1,the2,xxc,xx,dt
+     !real(real64) :: en,x,z,t,w,the1,the2,xxc,xx,dt
   end type one_event 
   integer, parameter :: event_size = 8 + 10 * 64
   !f2py integer*1, dimension(event_size) :: act
