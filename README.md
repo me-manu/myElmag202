@@ -7,6 +7,7 @@ This implementation provides all necessary files to install and run ELMAG from p
 ##Prerequisites
 
 You will need numpy with f2py. 
+Optionally, you can also install the package [eblstud](https://github.com/me-manu/eblstud) for the interpolation of EBL models. However, you only need it if you want to perform bin-by-bin simulations with ELMAG where each energy bin is weighted with the optical depth (in the `bin_by_bin_cascade` function in elmag202.py).
 
 ##Installation
 

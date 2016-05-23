@@ -18,7 +18,7 @@ class Elmag(object):
     fname = __module__.replace('.','/') + '.py'
 
     @defaults.setDefault
-    def __init__(self,model,color = False, **kwargs):
+    def __init__(self,model,**kwargs):
 	"""
 	Init the PyElmag class.
 
@@ -64,7 +64,7 @@ class Elmag(object):
 	# save the current dir
 	self.pwd = os.environ["PWD"]
 
-	self.replaceZero = 1e-5	# float that replaces zeros in elmag output
+	self.replaceZero = 1e-20 # float that replaces zeros in elmag output
 
 	try:
 	    self._e
@@ -200,9 +200,9 @@ class Elmag(object):
 	egmax = self.egmax if egmax == 0. else egmax
 	emin = self.emin if emin == 0. else emin
 	if emin < self.emin:
-	    raise ValueError(" ")
+	    raise ValueError("Requested emin={0:.3e} eV is below the emin set for ELMAG, {1:.3e} eV ".format(emin, self.emin))
 	if egmax > self.egmax:
-	    raise ValueError(" ")
+	    raise ValueError("Requested egmax={0:.3e} eV is above the egmax set for ELMAG, {1:.3e} eV ".format(egmax, self.egmax))
 
 	if distr == 'elmag':
 	    #self.e0, self.weight = self._e.initial_particle()
