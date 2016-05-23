@@ -85,10 +85,17 @@ class Elmag(object):
 	Set the names of the EBL density and redshift tables in a fortran readable way.
 	"""
 	tablefiles = [ path.join(self.tabledir,defaults.tables_n[self.model - 1]) ,
-			path.join(self.tabledir,defaults.tables_z[self.model - 1]) ]
+			path.join(self.tabledir,defaults.tables_z[self.model - 1]) ,
+			path.join(self.tabledir,'redshift')
+			]
 
 	for it,t in enumerate(tablefiles):
-	    fortran_table = self._e.user_variables.tablefile_z if it else self._e.user_variables.tablefile_n
+	    if not it:
+		fortran_table = self._e.user_variables.tablefile_n
+	    elif it == 1:
+		fortran_table = self._e.user_variables.tablefile_z
+	    elif it == 2:
+		fortran_table = self._e.user_variables.tablefile_redshift
 	    # some checks
 	    if len(t) > len(fortran_table):
 		raise ValueError("String {0:s} has length {1:n} > {2:n}. Too long!".format(t,
@@ -101,14 +108,19 @@ class Elmag(object):
 	    for i,s in enumerate(t):
 		if not it:
 		    self._e.user_variables.tablefile_n[i] = s
-		else:
+		elif it == 1:
 		    self._e.user_variables.tablefile_z[i] = s
+		elif it == 2:
+		    self._e.user_variables.tablefile_redshift[i] = s
+
 	    # fill up remaining characters with blanks:
 	    for j in range(i+1,len(fortran_table)):
 		if not it:
 		    self._e.user_variables.tablefile_n[j] = ''
-		else:
+		elif it == 1:
 		    self._e.user_variables.tablefile_z[j] = ''
+		elif it == 2:
+		    self._e.user_variables.tablefile_redshift[i] = s
 	    logging.info('Set table file to {0:s}'.format(t))
 	return
 

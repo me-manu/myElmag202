@@ -764,6 +764,7 @@ end function aintIR
 !=============================================================================!
 subroutine init_arrays(myid)
 !f2py intent(in) myid
+  use user_variables, only : tablefile_redshift
   implicit none
   integer i,n,n1,myid
   parameter (n=310,n1=69)
@@ -774,7 +775,7 @@ subroutine init_arrays(myid)
   common /data_div3/ t3,r3
   common /data_div4/ z4,r4
  
-  open(1,file='Tables/redshift')
+  open(1,file=tablefile_redshift, status = 'old')
   do i=0,n
      read(1,*) t1(i),z1(i),r3(i)
      z2(n-i) = z1(i)         

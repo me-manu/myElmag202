@@ -54,6 +54,7 @@ module user_variables
   gam2=-1.70d0
   character*400 :: tablefile_n = 'Tables/n_Dom.dat' ! file for photon density file
   character*400 :: tablefile_z = 'Tables/z-IR_Dom.dat' ! file for redshifts if required
+  character*400 :: tablefile_redshift = 'Tables/redshift' ! file for redshifts if required
 end module user_variables
 
 !=============================================================================!
