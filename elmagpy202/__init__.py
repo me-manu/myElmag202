@@ -1,1 +1,1 @@
-__all__ = ['elmag','defaults','halo']
+__all__ = ['elmag','defaults','halo','binbybin']
