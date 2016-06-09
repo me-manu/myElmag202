@@ -89,6 +89,7 @@ def calc_cont_radius_2d(bbbObsTimeCut,e_lbounds, theta, conf = 0.68, interp = Fa
 	# do not consider the primary gamma ray energies
 	efluxSum = bbbObsTimeCut[:i+1 if i+1 < bbbObsTimeCut.shape[0] else None,:,1:].sum(axis = 0)
 	for j,eo in enumerate(e_lbounds[1:]): # loop over observed energies
+	    # calculate the containment radius for each observed energy bin 
 	    r[i,j] = halo.calc_conf_radius(efluxSum, theta, conf, 
 	    	tmax = None,
 		emin = e_lbounds[j], 
