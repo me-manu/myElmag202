@@ -8,44 +8,31 @@ from scipy.integrate import simps
 from elmagpy202 import halo
 # --------------------- #
 
-def calc_spectral_weights(EeV_lbounds, pl, params, inj_spectrum, steps = 50):
+def calc_spectral_weights(EeV_centers, EeV_max, index_old, index_new):
     """
     Calculate weights for the cascade spectrum for each energy bin 
     to change the injection spectrum to an arbitrary spectrum.
+    Only works for bin-by-bin simulations with alpha_smp = 0
 
     Parameters
     ----------
-    EeV_lbounds:	(n+1)-dim array with left energy boundaries (observed) of the cascade spectrum. 
+    EeV_centers:	n-dim array with energy centers of the injected spectrum.
 			In units of eV.
-    pl:		Func. pointer to desired incjection power-law spectrum. Needs to be called with 
-		pl(EeV, **params) and has to be of format E dN / dE (In units of 1/s/cm^2).
-		Needs to except (n x m) dimensional energy arrays. Spectral index needs to be the same as 
-		for simulations.
-    params:	dict, power-law function parameters.
-    inj_spectrum: n-dim array with ELMAG output for injection spectrum (in obs. energy bins) in units of 1/time/area
-
-    kwargs
-    ------
-    steps:	int, number of integration steps for each energy bin for numerical 
-    		integration. default: 50
+    EeV_max:		float,
+    			maximum energy used for simulation (egbreak in simulation).
+			In units of eV.
+    index_old:		float,
+    			spectral index of simulated spectrum.
+    index_new:		float,
+    			desired spectral index. 
 
     Returns
     -------
     n-dim array with with weights. 
     """
     # set up energy integration array (in true energies)
-    log_earray = np.empty((EeV_lbounds.shape[0] - 1, steps))
-    for i, elb in enumerate(EeV_lbounds[:-1]):
-	log_earray[i] = np.linspace(np.log(elb), np.log(EeV_lbounds[i + 1]), steps)
-
-    # calculate energy flux in each energy bin in units of eV / s / cm^2
-    eflux = simps(spec_func(np.exp(log_earray), **params) * np.exp(log_earray), log_earray, axis = 1)
-    # divide by eflux of inj spectrum given by F_inj * delta E
-    de = EeV_lbounds[1:] - EeV_lbounds[:-1]
-    #eflux_inj = np.sqrt(EeV_lbounds[1:] * EeV_lbounds[:-1]) * inj_spectrum * np.log(EeV_lbounds[1:] / EeV_lbounds[:-1])
-    #weights = eflux / eflux_inj
-    weights = eflux / inj_spectrum / de 
-    return weights
+    reweight = np.power(EeV_centers / EeV_max, index_new - index_old)
+    return reweight
 
 def apply_time_cut(bbbObs, t_lbounds, tmax):
     """
