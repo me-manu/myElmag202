@@ -9,6 +9,7 @@ import warnings
 # -------------------------------------------------------- #
 
 def calc_conf_radius(hist_etht, theta, conf, 
+	start = 1,
 	tmax = None, 
 	t_lbounds = None, 
 	emin = None, emax = None,
@@ -37,6 +38,8 @@ def calc_conf_radius(hist_etht, theta, conf,
     interp:	bool, if true, use spline interpolation to find the containment 
     		radius. If false, use the nearest neighbour below the desired 
 		containment level
+    start:	int, 
+    		first theta bin to be used (0: all photons are cascade photons)
 
     Returns
     -------
@@ -53,12 +56,12 @@ def calc_conf_radius(hist_etht, theta, conf,
 	    raise ValueError("No cascade photons pass the chosen max. time cut of {0:.3e} years!".format(tmax))
 
 	idt	= idt[0][-1] 
-	hist	= hist_etht[:,1:,:idt].sum(axis = 2)	# index 1 in column 1: do not consider
+	hist	= hist_etht[:,start:,:idt].sum(axis = 2)	# index 1 in column 1: do not consider
 							# primary photons, sum over all time delays
     elif len(hist_etht.shape) == 2:	# case of no time axis
 	hist = hist_etht
     else:
-	hist = hist_etht[:,1:,:].sum(axis = 2)
+	hist = hist_etht[:,start:,:].sum(axis = 2)
 
     if not emax == None:
 	ide  = np.where(e_lbounds <= emax)
@@ -86,17 +89,25 @@ def calc_conf_radius(hist_etht, theta, conf,
 	else:
 	    idmax = idmax[0][0]
 	    sh = slice(idmax+1 if idmax <= hist.shape[0] else None)
-	    st = slice(1,idmax+2 if idmax+1 <= theta.shape[0] -1 else None)
+	    st = slice(start,idmax+2 if idmax+1 <= theta.shape[0] -1 else None)
 
 	# interpolate inverted cdf
 	# exclude first bin with primary emission
-	cdf_inv = USpline(hist[sh], np.log10(theta[st]), 
+	try:
+	    cdf_inv = USpline(hist[sh], np.log10(theta[st]), 
 		    s = 0, k = 1, ext = 'raise')
-	if np.isnan(cdf_inv(conf)):
-# interpolation did not work, likely because there are not 
-# many cascade photons with the applied cuts. Using nearest bin instead.
-	    idx = np.where(hist <= conf)
-	    return (theta[1:])[idx[0][-1]]
+	    if np.isnan(cdf_inv(conf)):
+		# interpolation did not work, likely because there are not 
+		# many cascade photons with the applied cuts. Using nearest bin instead.
+		idx = np.where(hist <= conf)
+		return (theta[start:])[idx[0][-1]]
+	except:
+		idx = np.where(hist <= conf)
+		if not len(idx) or not len(idx[0]):
+		    warnings.warn("No confidence level below {0:.3f}, minimum is {1:.3f}. Retruning 0".format(
+			conf, hist[0]), RuntimeWarning)
+		    return 0.
+		return (theta[start:])[idx[0][-1]]
 	return np.power(10.,cdf_inv(conf))
 
     else:
@@ -105,4 +116,4 @@ def calc_conf_radius(hist_etht, theta, conf,
 	    warnings.warn("No confidence level below {0:.3f}, minimum is {1:.3f}. Retruning 0".format(
 		conf, hist[0]), RuntimeWarning)
 	    return 0.
-	return (theta[1:])[idx[0][-1]]
+	return (theta[start:])[idx[0][-1]]

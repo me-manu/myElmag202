@@ -98,7 +98,8 @@ def calc_cont_radius_2d(bbbObsTimeCut,e_lbounds, theta, conf = 0.68, interp = Fa
 		emin = e_lbounds[j], 
 		emax = eo,
 		e_lbounds = e_lbounds,
-		interp = interp)
+		interp = interp,
+		start = start)
 	    #print "{0:.3e}   {1:.3e}   {2:.3f}".format(et / 1e12,eo/1e9,r[i,j])
     return r
 
