@@ -59,7 +59,7 @@ def apply_time_cut(bbbObs, t_lbounds, tmax):
     idt	= idt[0][-1] 
     return bbbObs[:,:,:,:idt].sum(axis = 3)
 
-def calc_cont_radius_2d(bbbObsTimeCut,e_lbounds, theta, conf = 0.68, interp = False):
+def calc_cont_radius_2d(bbbObsTimeCut,e_lbounds, theta, conf = 0.68, interp = False, start = 0):
     """
     Calculate the containment radius for a given confidence level for each observed energy bin
     and each true energy bin. True energy bins are treated as maximum injection energies.
@@ -78,6 +78,9 @@ def calc_cont_radius_2d(bbbObsTimeCut,e_lbounds, theta, conf = 0.68, interp = Fa
     interp:	bool, if true, use spline interpolation to find the containment 
     		radius. If false, use the nearest neighbour below the desired 
 		containment level
+    start:	int,
+		index of first theta bin.
+    		if 0 it assumes that all photons in bbbObsTimeCut are cascade photons, 
 
     Returns
     -------
@@ -87,7 +90,7 @@ def calc_cont_radius_2d(bbbObsTimeCut,e_lbounds, theta, conf = 0.68, interp = Fa
     for i,et in enumerate(e_lbounds[1:]):	# loop over true energies
 	# sum fluxes over true energies. This increases the maximum injection energy.
 	# do not consider the primary gamma ray energies
-	efluxSum = bbbObsTimeCut[:i+1 if i+1 < bbbObsTimeCut.shape[0] else None,:,1:].sum(axis = 0)
+	efluxSum = bbbObsTimeCut[:i+1 if i+1 < bbbObsTimeCut.shape[0] else None,:,start:].sum(axis = 0)
 	for j,eo in enumerate(e_lbounds[1:]): # loop over observed energies
 	    # calculate the containment radius for each observed energy bin 
 	    r[i,j] = halo.calc_conf_radius(efluxSum, theta, conf, 
