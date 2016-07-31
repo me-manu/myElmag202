@@ -213,7 +213,7 @@ class Elmag(object):
 	emin = self.emin if emin == 0. else emin
 	if emin < self.emin:
 	    raise ValueError("Requested emin={0:.3e} eV is below the emin set for ELMAG, {1:.3e} eV ".format(emin, self.emin))
-	if egmax > self.egmax:
+	if np.round(egmax,1) > np.round(self.egmax,1):
 	    raise ValueError("Requested egmax={0:.3e} eV is above the egmax set for ELMAG, {1:.3e} eV ".format(egmax, self.egmax))
 
 	if distr == 'elmag':
@@ -238,12 +238,11 @@ class Elmag(object):
 	add initial particle to a histogram
 	"""
 	i = np.min( (self.n_bine, 
-		int(np.log(self.e0/self.ethr)/np.log(self.egmax/self.ethr)*(self.n_bine-1)-np.log(1. + z)) + 1 )
+		int(np.log(self.e0/self.ethr)/np.log(self.egmax/self.ethr)*(self.n_bine-1)) + 1 )
 		)
 	i = np.max((i,1))
 	self.init_hist[i-1] += self.weight * \
-			      1./np.log(self.egmax/self.ethr)*(self.n_bine-1.)
-			      #self.e0/np.log(self.egmax/self.ethr)*(self.n_bine-1.) / (1.+z)
+			      1./np.log(self.egmax/self.ethr)*(self.n_bine-1.) * np.power(1.+z,1. + self.gam1)
 	return
 
     def cascade(self,z):
